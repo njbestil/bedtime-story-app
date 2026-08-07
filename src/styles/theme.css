@@ -1,0 +1,12 @@
+@theme {
+  --color-app-background: #07111c;
+  --color-content-primary: #62a8e5;
+  --color-content-muted: #285679;
+  --color-outline-muted: #21415c;
+  --color-brand-accent: #f5a623;
+  --color-heading-accent: #f4b640;
+  --color-progress-track: #17283a;
+  --color-progress-value: #f5aa22;
+
+  --font-pirate: "Old English Text MT", Georgia, serif;
+}
