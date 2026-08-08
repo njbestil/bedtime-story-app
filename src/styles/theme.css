@@ -1,12 +1,107 @@
 @theme {
+  --color-app-canvas: #03080e;
   --color-app-background: #07111c;
+  --color-app-surface: #0c1a2a;
   --color-content-primary: #62a8e5;
   --color-content-muted: #285679;
   --color-outline-muted: #21415c;
-  --color-brand-accent: #f5a623;
-  --color-heading-accent: #f4b640;
+  --color-outline-strong: #1f405c;
+  --color-brand-accent: #e8d5a0;
+  --color-brand-highlight: #f4b640;
   --color-progress-track: #17283a;
   --color-progress-value: #f5aa22;
 
   --font-pirate: "Old English Text MT", Georgia, serif;
+
+  --text-brand: 1.125rem;
+  --text-brand--line-height: 1;
+  --text-pirate-heading: clamp(1.5rem, 6vw, 1.9rem);
+  --text-pirate-heading--line-height: 1.25;
+  --text-pirate-section: 1.25rem;
+  --text-pirate-section--line-height: 1.25;
+  --text-screen-title: 1.875rem;
+  --text-screen-title--line-height: 1.25;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.5rem;
+  --text-action: 1rem;
+  --text-action--line-height: 1.5rem;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1rem;
+  --text-overline: 0.625rem;
+  --text-overline--line-height: 1rem;
+  --text-card-title: 0.875rem;
+  --text-card-title--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-micro: 0.625rem;
+  --text-micro--line-height: 1rem;
+
+  --tracking-eyebrow: 0.2em;
+  --tracking-overline: 0.16em;
+  --tracking-progress: 0.18em;
+}
+
+@utility type-brand {
+  font-family: var(--font-pirate);
+  font-size: var(--text-brand);
+  line-height: var(--text-brand--line-height);
+}
+
+@utility type-pirate-heading {
+  font-family: var(--font-pirate);
+  font-size: var(--text-pirate-heading);
+  line-height: var(--text-pirate-heading--line-height);
+}
+
+@utility type-pirate-section {
+  font-family: var(--font-pirate);
+  font-size: var(--text-pirate-section);
+  line-height: var(--text-pirate-section--line-height);
+}
+
+@utility type-screen-title {
+  font-family: var(--font-pirate);
+  font-size: var(--text-screen-title);
+  line-height: var(--text-screen-title--line-height);
+}
+
+@utility type-body {
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+@utility type-action {
+  font-size: var(--text-action);
+  font-weight: 600;
+  line-height: var(--text-action--line-height);
+}
+
+@utility type-eyebrow {
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  text-transform: uppercase;
+}
+
+@utility type-overline {
+  font-size: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  line-height: var(--text-overline--line-height);
+  text-transform: uppercase;
+}
+
+@utility type-card-title {
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  line-height: var(--text-card-title--line-height);
+}
+
+@utility type-caption {
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+}
+
+@utility type-micro {
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
 }
