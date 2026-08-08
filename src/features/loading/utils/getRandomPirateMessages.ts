@@ -1,4 +1,4 @@
-import { PIRATE_MESSAGES } from '../loading.constants'
+import { PIRATE_MESSAGES } from '../../../assets/pirateMessages'
 import type { PirateMessage } from '../loading.types'
 
 export function getRandomPirateMessage(

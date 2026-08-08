@@ -1,4 +1,4 @@
-import type { PIRATE_MESSAGES } from './loading.constants'
+import type { PIRATE_MESSAGES } from '../../assets/pirateMessages'
 
 export type PirateMessage = (typeof PIRATE_MESSAGES)[number]
 
