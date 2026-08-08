@@ -1,11 +1,7 @@
 import pirateShipLoading from '../../assets/pirate-ship-loading.gif'
 import ScreenContent from '../../components/layouts/ScreenContent'
 import { FaAnchor } from "react-icons/fa6";
-
-type LoadingScreenProps = {
-  progress: number
-  message: string
-}
+import type { LoadingScreenProps } from './loading.types'
 
 function LoadingScreen({ progress, message }: LoadingScreenProps) {
   const normalizedProgress = Math.min(100, Math.max(0, progress))

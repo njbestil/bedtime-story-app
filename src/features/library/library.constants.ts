@@ -1,8 +1,4 @@
-export type LibraryStory = {
-  id: string
-  title: string
-  category: string
-}
+import type { LibraryStory } from './library.types'
 
 export const SAVED_STORIES: LibraryStory[] = [
   {

@@ -194,7 +194,19 @@ function Header() {
 
   return (
     <div className="bg-app-background sticky top-0 z-40">
-      <header className="bg-app-surface border-outline-muted relative z-[60] flex min-h-11 items-center justify-between border-b px-2.5 py-[max(0.5rem,calc(env(safe-area-inset-top)+0.25rem))]">
+      <header className="
+        bg-app-surface 
+        border-outline-muted 
+        relative 
+        z-[60] 
+        flex 
+        min-h-11 
+        items-center 
+        justify-between 
+        border-b 
+        px-2.5 
+        py-[max(0.5rem,calc(env(safe-area-inset-top)+0.25rem))]
+      ">
         {isContextualHeader ? (
           <ContextualHeader
             isMenuOpen={isMenuOpen}

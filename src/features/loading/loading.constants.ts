@@ -1,3 +1,7 @@
+export const SIMULATED_LOADING_DURATION_MS = 4000
+export const LOADING_MESSAGE_INTERVAL = 20
+export const LAUNCH_MESSAGE = 'Land ho! Storytime awaits'
+
 export const PIRATE_MESSAGES = [
   'Setting sail for story shores',
   'Following the map to adventure',
@@ -22,7 +26,5 @@ export const PIRATE_MESSAGES = [
   'Dropping anchor at adventure island',
   'The story treasure is in sight',
   'Adventure ashore, matey!',
-  'We’ve reached the story shores'
-]
-
-export type PirateMessage = (typeof PIRATE_MESSAGES)[number]
+  'We’ve reached the story shores',
+] as const

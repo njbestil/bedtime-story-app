@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { APP_PATHS } from '../../routes/paths'
 import LoadingScreen from './LoadingScreen'
+import { LAUNCH_MESSAGE, LOADING_MESSAGE_INTERVAL } from './loading.constants'
 import { getPirateMessageSequence } from './utils/getRandomPirateMessages'
 import { simulateLoading } from './utils/simulateLoading'
-
-const LOADING_MESSAGE_INTERVAL = 20
-const LAUNCH_MESSAGE = 'Land ho! Storytime awaits'
 
 function LoadingRoute() {
   const navigate = useNavigate()

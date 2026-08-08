@@ -1,7 +1,8 @@
-const SIMULATED_LOADING_DURATION_MS = 4000
+import { SIMULATED_LOADING_DURATION_MS } from '../loading.constants'
+import type { LoadingProgressUpdater } from '../loading.types'
 
 export function simulateLoading(
-  updateProgress: (progress: number) => void,
+  updateProgress: LoadingProgressUpdater,
   durationMs = SIMULATED_LOADING_DURATION_MS,
 ) {
   let progress = 0

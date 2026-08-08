@@ -1,7 +1,5 @@
-import {
-  PIRATE_MESSAGES,
-  type PirateMessage,
-} from '../../../assets/pirateMessages'
+import { PIRATE_MESSAGES } from '../loading.constants'
+import type { PirateMessage } from '../loading.types'
 
 export function getRandomPirateMessage(
   excludedMessage?: PirateMessage,

@@ -1,27 +1,72 @@
+import { type SubmitEvent, useState } from 'react'
 import { FaRegCompass } from 'react-icons/fa6'
 import Button from '../../components/Button'
+import OptionalStoryDetails from './components/OptionalStoryDetails'
+import StoryBasicsFields from './components/StoryBasicsFields'
+import {
+  INITIAL_FORM_VALUES,
+  STORY_CATEGORIES,
+  STORY_LENGTHS,
+} from './storyGenerator.constants'
+import type { StoryFormChangeHandler, StoryFormValues } from './storyGenerator.types'
 
 function StoryGeneratorScreen() {
+  const [formValues, setFormValues] = useState<StoryFormValues>(INITIAL_FORM_VALUES)
+  const [isOptionalDetailsOpen, setIsOptionalDetailsOpen] = useState(false)
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
+
+  const updateField: StoryFormChangeHandler = (field) => {
+    return (event) => {
+      setFormValues((currentValues) => ({
+        ...currentValues,
+        [field]: event.target.value,
+      }))
+    }
+  }
+
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
+  }
+
+  const handleDescriptionInvalid = () => {
+    setHasAttemptedSubmit(true)
+  }
+
   return (
-    <section className="py-12 text-center" aria-labelledby="generator-title">
-      <p className="type-eyebrow text-brand-accent">
-        New adventure
-      </p>
-      <h1
-        id="generator-title"
-        className="type-screen-title text-brand-accent mt-3"
-      >
-        Create a story
+    <section className="pt-6 pb-28" aria-labelledby="generator-title">
+      <h1 id="generator-title" className="sr-only">
+        Find a Story
       </h1>
-      <p className="type-body mx-auto mt-3 max-w-sm">
-        The story-creation form will be added in the next phase.
-      </p>
 
+      <form id="story-generator-form" className="space-y-7" onSubmit={handleSubmit}>
+        <StoryBasicsFields
+          categories={STORY_CATEGORIES}
+          selectedCategory={formValues.category}
+          description={formValues.description}
+          descriptionError={
+            hasAttemptedSubmit && !formValues.description.trim()
+              ? "Please describe the kind of story you'd like."
+              : undefined
+          }
+          onCategoryChange={updateField('category')}
+          onDescriptionChange={updateField('description')}
+          onDescriptionInvalid={handleDescriptionInvalid}
+        />
 
+        <OptionalStoryDetails
+          isOpen={isOptionalDetailsOpen}
+          lengths={STORY_LENGTHS}
+          values={formValues}
+          onToggle={() => setIsOptionalDetailsOpen((isOpen) => !isOpen)}
+          onFieldChange={updateField}
+        />
+      </form>
 
-<Button leadingIcon={<FaRegCompass />}>
-  Generate Story
-</Button>
+      <div className="bg-app-background/95 border-outline-muted fixed inset-x-0 bottom-0 z-30 border-t px-2.5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm">
+        <Button form="story-generator-form" type="submit" leadingIcon={<FaRegCompass />}>
+          Set Sail!
+        </Button>
+      </div>
     </section>
   )
 }
