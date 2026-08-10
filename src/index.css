@@ -3,6 +3,7 @@
 
 body {
   margin: 0;
+  background-color: #07111c;
 }
 
 @keyframes menu-open {

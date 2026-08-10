@@ -3,6 +3,7 @@ import { SAVED_STORIES } from './library.constants'
 import { useNavigate } from 'react-router'
 import StorySearchSection from './components/StorySearchSection'
 import StoryInventorySection from './components/StoryInventorySection'
+import AppHeader from '../../components/layouts/AppHeader'
 
 function LibraryScreen() {
   const navigate = useNavigate()
@@ -13,8 +14,8 @@ function LibraryScreen() {
 
   return (
     <>
+      <AppHeader />
       <StorySearchSection imgSrc={pirateBoySearching} navigate={handleNavigate} />
-    
       <StoryInventorySection stories={SAVED_STORIES} navigate={handleNavigate} />
     </>
   )

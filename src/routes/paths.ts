@@ -1,6 +1,7 @@
 export const APP_PATHS = {
   loading: '/',
   library: '/library',
+  settings: '/settings',
   storyGenerator: '/stories/new',
   storyReader: '/stories/:id',
 } as const

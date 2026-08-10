@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Route, Routes } from 'react-router'
 import LibraryScreen from '../features/library/LibraryScreen'
 import LoadingRoute from '../features/loading/LoadingRoute'
+import SettingsScreen from '../features/settings/SettingsScreen'
 import StoryGeneratorScreen from '../features/story-generator/StoryGeneratorScreen'
 import StoryReaderScreen from '../features/story-reader/StoryReaderScreen'
 import { APP_PATHS } from './paths'
@@ -17,6 +18,7 @@ function AppRoutes({ layout }: AppRoutesProps) {
 
       <Route element={layout}>
         <Route path={APP_PATHS.library} element={<LibraryScreen />} />
+        <Route path={APP_PATHS.settings} element={<SettingsScreen />} />
         <Route path={APP_PATHS.storyGenerator} element={<StoryGeneratorScreen />} />
         <Route path={APP_PATHS.storyReader} element={<StoryReaderScreen />} />
       </Route>
