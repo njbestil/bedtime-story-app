@@ -67,6 +67,7 @@ Saved story cards must deep-link directly to the reader. Browser navigation must
 - Express routes own `/api` HTTP endpoints. React routing does not replace API routing.
 - PostgreSQL is the durable source of truth. Browser storage may only be a temporary progress fallback.
 - Keep the OpenAI API key, prompts, raw responses, validation, and provider diagnostics on the server.
+- Store generated story artwork in Cloudflare R2. PostgreSQL stores the resulting R2 asset URL and accessible alt text, never image bytes or Base64 data.
 - Use one focused OpenAI service instead of a broad generic service layer.
 
 ## System boundary
@@ -78,7 +79,9 @@ React + Vite UI
     v
 Express API routes -> validation middleware -> story controller
                                             |-> story model -> PostgreSQL
-                                            \-> OpenAI service -> OpenAI Responses API
+                                            \-> OpenAI service -> OpenAI text and image generation
+                                                                        |-> R2 storage service -> Cloudflare R2
+                                                                        \-> image URL -> PostgreSQL
 ```
 
 React owns presentation, interaction, navigation, and local UI state. Express owns the API contract and server-only concerns. Models own PostgreSQL access. The OpenAI service owns prompt construction, provider calls, generated-output validation, and safe error classification.
@@ -205,7 +208,8 @@ server/
 |   |-- storyRoutes.ts
 |   `-- index.ts
 |-- services/
-|   `-- openaiService.ts
+|   |-- openaiService.ts
+|   `-- r2StorageService.ts
 |-- validators/
 |   |-- storyValidator.ts
 |   `-- openaiResponseValidator.ts
@@ -223,6 +227,7 @@ server/
 | Controller | Orchestrating requests, services, models, and HTTP status codes | Raw SQL, API keys, or large prompts |
 | Model | Parameterized PostgreSQL operations and database-record mapping | Express request/response objects or OpenAI calls |
 | OpenAI service | Prompt construction, OpenAI calls, output validation, and provider-failure classification | HTTP response objects or browser concerns |
+| R2 storage service | Converts generated image data into an uploadable file, uploads it to the configured Cloudflare R2 bucket, and returns the object URL | OpenAI prompts, PostgreSQL queries, or HTTP response objects |
 
 Validators define the rules; middleware executes reusable validation within the Express request lifecycle. Keeping both prevents middleware from becoming a collection of duplicated schemas.
 
@@ -254,8 +259,8 @@ The initial API should remain small:
 | Table | Important fields | Purpose and constraints |
 | --- | --- | --- |
 | `sessions` | `id`, `created_at`, `last_seen_at` | Own anonymous data until authentication exists; use an opaque server-issued identifier. |
-| `stories` | `id`, `session_id`, `title`, `genre`, `status`, `saved`, `cover_image_url`, `cover_image_alt_text`, request fields, `created_at` | Parent record for generation and inventory; cover fields are optional hosted/static assets with accessible descriptions, and `status` is `generating`, `completed`, or `failed`. |
-| `story_pages` | `story_id`, `page_number`, `content`, `image_url`, `image_alt_text` | Ordered reader content and optional page artwork; unique on `(story_id, page_number)`. |
+| `stories` | `id`, `session_id`, `title`, `genre`, `status`, `saved`, `cover_image_url`, `cover_image_alt_text`, request fields, `created_at` | Parent record for generation and inventory; cover fields are optional Cloudflare R2 asset URLs with accessible descriptions, and `status` is `generating`, `completed`, or `failed`. |
+| `story_pages` | `story_id`, `page_number`, `content`, `image_url`, `image_alt_text` | Ordered reader content and optional page artwork. `image_url` references a Cloudflare R2 asset; unique on `(story_id, page_number)`. |
 | `reading_progress` | `session_id`, `story_id`, `current_page`, `updated_at` | One progress row per owner and story; enforce a composite unique key. |
 | `idempotency_keys` | `session_id`, `key`, `story_id`, `expires_at` | Prevent double taps and request retries from creating duplicate stories. |
 
@@ -275,7 +280,7 @@ OpenAI integration stays behind Express. The browser must never receive the API 
 
 Use the Responses API with Structured Outputs and request a predictable result containing the title, genre, summary, and ordered pages. Each page should include `pageNumber`, `content`, `imagePrompt`, and `imageAltText`. Select the exact text model and validation technology during implementation using current official guidance and the project's installed dependencies.
 
-The text model should return image instructions, not a hosted image URL. The server may send each validated `imagePrompt` to a separate image-generation step, upload the resulting asset to approved storage, and persist the returned URL in `story_pages.image_url`. Persist the accessibility description in `story_pages.image_alt_text`. If image generation is skipped or fails, both image fields may remain null and the reader uses a safe genre-based placeholder.
+The text model returns image instructions, not a hosted image URL. The server sends each validated `imagePrompt` to OpenAI image generation, receives the final image as Base64-encoded image data, converts it to a file buffer, and uploads that buffer to Cloudflare R2. The R2 storage service returns the durable asset URL, which the server persists in `story_pages.image_url`; `imageAltText` is persisted in `story_pages.image_alt_text`. The API sends only the stored URL to the browser. If image generation or the R2 upload fails, both image fields may remain null and the reader uses a safe genre-based placeholder.
 
 Example validated model output:
 
@@ -295,7 +300,7 @@ Example validated model output:
 }
 ```
 
-The server adds database-owned fields such as `id`, `session_id`, `status`, `saved`, timestamps, and `prompt_version`; these must not be requested from or trusted as model output. The raw provider response, prompt, and base64 image data are not stored in PostgreSQL.
+The server adds database-owned fields such as `id`, `session_id`, `status`, `saved`, timestamps, and `prompt_version`; these must not be requested from or trusted as model output. The raw provider response, prompt, image bytes, and Base64 image data are not stored in PostgreSQL. R2 object keys should be deterministic and scoped, for example `stories/{storyId}/pages/{pageNumber}.png`.
 
 Server-side TypeScript example (illustrative; keep the model name and schema in validated server configuration):
 
@@ -333,8 +338,8 @@ This is a server-only example. The browser must call Express and must never rece
 3. Call the configured OpenAI model with a timeout and intentional output limits.
 4. Validate the returned title, genre, summary, ordered pages, image prompts, and accessibility descriptions.
 5. Reject empty pages, malformed structures, refusals or unsafe content, and content exceeding application limits.
-6. Persist the story and text pages transactionally. Treat page-image generation as an optional follow-up; update `image_url` only after an asset is successfully generated and stored.
-7. Return a stable client contract with nullable `imageUrl` and `imageAltText` when artwork is unavailable.
+6. Persist the story and text pages transactionally. For each page, send the validated `imagePrompt` to OpenAI image generation, decode the returned Base64 image data into a buffer, and upload that buffer to Cloudflare R2.
+7. Update `story_pages.image_url` only after the R2 upload succeeds; persist `image_alt_text` from the validated story response. Return a stable client contract with nullable `imageUrl` and `imageAltText` when artwork is unavailable.
 
 ### Failure behavior
 
@@ -346,11 +351,12 @@ This is a server-only example. The browser must call Express and must never rece
 | Malformed or empty output | Fail output validation and write nothing | Preserve the form and offer Retry |
 | Database failure | Roll back the transaction and log a correlation identifier | Show a generic save failure and never claim success |
 
-Treat page-image generation as optional and separate from the text-critical path. A genre-based local placeholder must allow the story reader to open when image generation is slow, unavailable, or deferred. Use a hosted asset URL in the API/database, never a base64 image payload in PostgreSQL.
+Treat page-image generation as optional and separate from the text-critical path. A genre-based local placeholder must allow the story reader to open when image generation or Cloudflare R2 is slow, unavailable, or deferred. Use the R2 asset URL in the API/database, never a Base64 image payload or binary image data in PostgreSQL.
 
 ## Security and privacy
 
 - Keep `OPENAI_API_KEY` and database credentials in validated server environment variables. Commit placeholders only in `.env.example`.
+- Keep Cloudflare R2 credentials and bucket configuration in validated server environment variables. Use a least-privilege R2 token that can write only to this app's bucket; never expose it to React.
 - Use secure, HTTP-only session cookies when anonymous ownership is required.
 - Minimize child-identifying information sent to OpenAI.
 - Do not log child names, story descriptions, API keys, credentials, prompts, raw provider payloads, or SQL values by default.

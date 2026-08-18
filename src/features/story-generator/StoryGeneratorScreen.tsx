@@ -1,11 +1,8 @@
 import { type SubmitEvent, useState } from 'react'
-import { useNavigate } from "react-router"
-import { FaRegCompass, FaBookSkull} from 'react-icons/fa6'
+import { FaRegCompass } from 'react-icons/fa6'
 import Button from '../../components/Button'
 import OptionalStoryDetails from './components/OptionalStoryDetails'
 import StoryBasicsFields from './components/StoryBasicsFields'
-import AppHeader from '../../components/layouts/AppHeader'
-import { APP_PATHS } from "../../routes/paths"
 import {
   INITIAL_FORM_VALUES,
   STORY_CATEGORIES,
@@ -14,7 +11,6 @@ import {
 import type { StoryFormChangeHandler, StoryFormValues } from './storyGenerator.types'
 
 function StoryGeneratorScreen() {
-  const navigate = useNavigate()
   const [formValues, setFormValues] = useState<StoryFormValues>(INITIAL_FORM_VALUES)
   const [isOptionalDetailsOpen, setIsOptionalDetailsOpen] = useState(false)
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
@@ -36,32 +32,8 @@ function StoryGeneratorScreen() {
     setHasAttemptedSubmit(true)
   }
 
-  function handleLibraryClick() {
-    navigate(APP_PATHS.library)
-  }
-
-  const headerStart = (
-    <button
-      type="button"
-      className="text-content-primary flex items-center gap-1 text-sm"
-      aria-label="Library"
-      onClick={handleLibraryClick}
-    >
-      <FaBookSkull aria-hidden="true" />
-      <span>Library</span>
-    </button>
-  )
-
-  const headerCenter = (
-    <h1 className="type-brand text-brand-accent ">
-      Find a Story
-    </h1>
-  )
-
   return (
-    <>
-      <AppHeader start={headerStart}  center={headerCenter} />
-      <section className="pt-6 pb-28" aria-labelledby="generator-title">
+    <section className="pt-6 pb-28" aria-labelledby="generator-title">
         <h1 id="generator-title" className="sr-only">
           Find a Story
         </h1>
@@ -95,8 +67,7 @@ function StoryGeneratorScreen() {
             Set Sail!
           </Button>
         </div>
-      </section>
-    </>
+    </section>
   )
 }
 

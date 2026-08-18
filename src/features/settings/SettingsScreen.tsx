@@ -3,7 +3,6 @@ import Input from '../../components/Input'
 import RadioButton from '../../components/RadioButton'
 import { GENDER_VALUES } from './settings.constants'
 import type { SettingsFormChangeHandler, SettingsFormValues } from './settings.types'
-import AppHeader from '../../components/layouts/AppHeader'
 import Button from '../../components/Button'
 import { useNavigate } from 'react-router'
 import { APP_PATHS } from '../../routes/paths'
@@ -42,19 +41,15 @@ function SettingsScreen() {
     navigate(APP_PATHS.library)
   }
 
-  const headerCenter = (
-    <h1 className="type-brand text-brand-accent ">
-      Settings
-    </h1>
-  )
-
   return (
-    <>
-      <AppHeader center={headerCenter} />
-      <section
+    <section
         className="flex min-h-[calc(100svh-2.75rem)] flex-col items-center justify-center py-6 text-center"
         aria-labelledby="settings-title"
       >
+        <h1 id="settings-title" className="sr-only">
+          Settings
+        </h1>
+
         <form id="settings-form" className="mt-6 w-full max-w-sm space-y-6" onSubmit={handleSubmit}>
           <div className="text-center">
             <label htmlFor="child-name" className="type-card-title text-content-primary mb-2 block">
@@ -110,8 +105,7 @@ function SettingsScreen() {
             Save
           </Button>
         </div>
-      </section>
-    </>
+    </section>
   )
 }
 

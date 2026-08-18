@@ -1,15 +1,9 @@
 import { useRef, useState } from 'react'
-import { FaBookSkull, FaBookmark, FaRegBookmark } from 'react-icons/fa6'
 import Pagination from '../../components/Pagination'
-import AppHeader from '../../components/layouts/AppHeader'
-import { APP_PATHS } from '../../routes/paths'
-import { useNavigate } from 'react-router'
 import { MOONLIT_MAP_STORY } from './storyReader.constants'
 import { useStoryPagination } from './hooks/useStoryPagination'
 
 function StoryReaderScreen() {
-  const navigate = useNavigate()
-  const [isBookmarked, setIsBookmarked] = useState(MOONLIT_MAP_STORY.isBookmark)
   const [selectedPage, setSelectedPage] = useState(1)
   const storyContentRef = useRef<HTMLDivElement>(null)
   const storyPages = useStoryPagination(MOONLIT_MAP_STORY.story, storyContentRef)
@@ -20,14 +14,6 @@ function StoryReaderScreen() {
   const pageStatus =
     currentPage === 1 ? 'Beginning' : currentPage === totalPages ? 'The End' : 'Reading...'
 
-  function handleLibraryClick() {
-    navigate(APP_PATHS.library)
-  }
-
-  function handleBookMarkClick() {
-    setIsBookmarked((isBookmarked) => !isBookmarked)
-  }
-
   function handlePreviousPage() {
     setSelectedPage((page) => Math.max(page - 1, 1))
   }
@@ -36,33 +22,8 @@ function StoryReaderScreen() {
     setSelectedPage((page) => Math.min(page + 1, totalPages))
   }
 
-  const headerStart = (
-    <button
-      type="button"
-      className="text-content-primary flex items-center gap-1 text-sm"
-      aria-label="Library"
-      onClick={handleLibraryClick}
-    >
-      <FaBookSkull aria-hidden="true" />
-      <span>Library</span>
-    </button>
-  )
-
-  const headerEnd = (
-    <button
-      type="button"
-      className="text-brand-highlight flex items-center gap-1 text-sm"
-      aria-label={isBookmarked ? 'Remove bookmark' : 'Save story'}
-      onClick={handleBookMarkClick}
-    >
-      {isBookmarked ? <FaBookmark aria-hidden="true" /> : <FaRegBookmark aria-hidden="true" />}
-    </button>
-  )
-
   return (
     <>
-      <AppHeader start={headerStart} end={headerEnd} />
-
       <section
         className="flex h-[calc(100svh-2.75rem)] flex-col pb-[calc(6rem+env(safe-area-inset-bottom))]"
         aria-labelledby="reader-title"

@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useState } from 'react'
+import { type MouseEvent, type ReactNode, useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router'
 import { FaAnchor, FaBars, FaXmark } from 'react-icons/fa6'
 import { APP_PATHS, getStoryReaderPath } from '../../routes/paths'
@@ -12,9 +12,9 @@ const MENU_ITEMS = [
 type MenuState = 'closed' | 'open' | 'closing'
 
 type AppHeaderProps = {
-  start?: React.ReactNode
-  center?: React.ReactNode
-  end?: React.ReactNode
+  start?: ReactNode
+  center?: ReactNode
+  end?: ReactNode
 }
 
 type MenuNavigationProps = {

@@ -1,5 +1,4 @@
 import pirateShipLoading from '../../assets/pirate-ship-loading.gif'
-import ScreenContent from '../../components/layouts/ScreenContent'
 import { FaAnchor } from "react-icons/fa6";
 import type { LoadingScreenProps } from './loading.types'
 
@@ -11,10 +10,7 @@ function LoadingScreen({ progress, message }: LoadingScreenProps) {
       className="bg-app-background text-content-primary min-h-svh text-center"
       aria-busy="true"
     >
-      <ScreenContent
-        padding="wide"
-        className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col pb-[max(clamp(2rem,calc(16svh-3.375rem),5rem),env(safe-area-inset-bottom))]"
-      >
+      <div className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col px-8 pb-[max(clamp(2rem,calc(16svh-3.375rem),5rem),env(safe-area-inset-bottom))]">
         <section
           className="flex flex-1 flex-col items-center justify-center"
           aria-labelledby="loading-title"
@@ -78,7 +74,7 @@ function LoadingScreen({ progress, message }: LoadingScreenProps) {
           </p>
         </div>
 
-      </ScreenContent>
+      </div>
     </main>
   )
 }
