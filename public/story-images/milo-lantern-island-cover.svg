@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title description">
+  <title id="title">Milo and the Lantern Island</title>
+  <desc id="description">A little pirate ship sails toward a lantern-lit island under a starry night sky.</desc>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#10214c"/><stop offset="1" stop-color="#355a8c"/></linearGradient></defs>
+  <rect width="800" height="500" fill="url(#sky)"/>
+  <circle cx="665" cy="85" r="52" fill="#fff1be"/><g fill="#fff7d6"><circle cx="91" cy="72" r="3"/><circle cx="196" cy="125" r="4"/><circle cx="344" cy="60" r="3"/><circle cx="504" cy="118" r="3"/><circle cx="738" cy="185" r="4"/></g>
+  <path d="M0 315 C140 270 220 350 370 315 S630 270 800 330 V500 H0Z" fill="#17486d"/><path d="M0 375 C155 325 275 405 430 362 S650 335 800 392 V500 H0Z" fill="#0d3155"/>
+  <path d="M492 306 L585 215 L675 306Z" fill="#254c39"/><path d="M535 310 L612 245 L710 310Z" fill="#1b3e30"/><path d="M420 330 L485 305 L550 330Z" fill="#e1bd5c"/>
+  <g transform="translate(225 265)"><path d="M0 95 Q93 142 186 95 L160 132 Q93 165 26 132Z" fill="#6e3f27"/><path d="M88 95 V0" stroke="#3b281e" stroke-width="9"/><path d="M92 9 L155 77 H92Z" fill="#e9d8a6"/><path d="M84 26 L32 84 H84Z" fill="#d9a34b"/><circle cx="95" cy="112" r="8" fill="#ffdb6e"/></g>
+  <g transform="translate(620 210)"><path d="M0 18 h30 l-5 46 h-20Z" fill="#f0b953"/><path d="M6 24 h18 v23H6Z" fill="#fff2a1"/><path d="M0 18 Q15 -2 30 18" fill="none" stroke="#f0b953" stroke-width="5"/><circle cx="15" cy="40" r="52" fill="#ffd965" opacity=".18"/></g>
+  <text x="40" y="455" fill="#fff4cc" font-family="Georgia,serif" font-size="38">Milo and the Lantern Island</text>
+</svg>

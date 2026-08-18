@@ -185,20 +185,20 @@ These routes are target architecture. Confirm the router currently installed bef
 
 ## Express server
 
-The server is narrowly responsible for story CRUD, reading progress, PostgreSQL persistence, and OpenAI story generation. Use familiar Laravel-style folder names while keeping the implementation idiomatic TypeScript.
+The server is narrowly responsible for story CRUD, reading progress, PostgreSQL persistence, and OpenAI story generation. Use clear, plural folder names for layers that will contain multiple files while keeping the implementation idiomatic TypeScript.
 
 ```text
 server/
 |-- config/
 |   |-- database.ts
 |   `-- environment.ts
-|-- controller/
+|-- controllers/
 |   `-- storyController.ts
 |-- middleware/
 |   |-- errorHandler.ts
 |   |-- notFoundHandler.ts
 |   `-- validateRequest.ts
-|-- model/
+|-- models/
 |   |-- storyModel.ts
 |   `-- readingProgressModel.ts
 |-- routes/
@@ -254,8 +254,8 @@ The initial API should remain small:
 | Table | Important fields | Purpose and constraints |
 | --- | --- | --- |
 | `sessions` | `id`, `created_at`, `last_seen_at` | Own anonymous data until authentication exists; use an opaque server-issued identifier. |
-| `stories` | `id`, `session_id`, `title`, `genre`, `status`, `saved`, request fields, `created_at` | Parent record for generation and inventory; constrain status and index ownership. |
-| `story_pages` | `story_id`, `page_number`, `content`, `image_url` | Ordered reader content; unique on `(story_id, page_number)`. |
+| `stories` | `id`, `session_id`, `title`, `genre`, `status`, `saved`, `cover_image_url`, `cover_image_alt_text`, request fields, `created_at` | Parent record for generation and inventory; cover fields are optional hosted/static assets with accessible descriptions, and `status` is `generating`, `completed`, or `failed`. |
+| `story_pages` | `story_id`, `page_number`, `content`, `image_url`, `image_alt_text` | Ordered reader content and optional page artwork; unique on `(story_id, page_number)`. |
 | `reading_progress` | `session_id`, `story_id`, `current_page`, `updated_at` | One progress row per owner and story; enforce a composite unique key. |
 | `idempotency_keys` | `session_id`, `key`, `story_id`, `expires_at` | Prevent double taps and request retries from creating duplicate stories. |
 
@@ -267,21 +267,74 @@ The initial API should remain small:
 - Define explicit foreign-key deletion behavior rather than relying on implicit cascading.
 - Keep provider diagnostics out of user-facing database fields and API responses.
 - Roll back the complete transaction when persistence fails.
+- Keep the existing `completed` database status; do not introduce a competing `ready` status. A reader screen may be visually ready when its story status is `completed`.
 
 ## OpenAI story generation
 
 OpenAI integration stays behind Express. The browser must never receive the API key, internal prompt, raw provider response, or sensitive diagnostics.
 
-Use the Responses API and request a predictable structured result containing at least the title, genre, summary, and ordered story pages. Select the exact model and validation technology during implementation using current official guidance and the project's installed dependencies.
+Use the Responses API with Structured Outputs and request a predictable result containing the title, genre, summary, and ordered pages. Each page should include `pageNumber`, `content`, `imagePrompt`, and `imageAltText`. Select the exact text model and validation technology during implementation using current official guidance and the project's installed dependencies.
+
+The text model should return image instructions, not a hosted image URL. The server may send each validated `imagePrompt` to a separate image-generation step, upload the resulting asset to approved storage, and persist the returned URL in `story_pages.image_url`. Persist the accessibility description in `story_pages.image_alt_text`. If image generation is skipped or fails, both image fields may remain null and the reader uses a safe genre-based placeholder.
+
+Example validated model output:
+
+```json
+{
+  "title": "The Little Star Sailor",
+  "genre": "adventure",
+  "summary": "A young sailor follows a fallen star across the night sea.",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "content": "Milo looked across the moonlit ocean...",
+      "imagePrompt": "A gentle bedtime-story illustration of a young sailor on a small wooden boat under a glowing moon.",
+      "imageAltText": "A young sailor gazing across the moonlit ocean"
+    }
+  ]
+}
+```
+
+The server adds database-owned fields such as `id`, `session_id`, `status`, `saved`, timestamps, and `prompt_version`; these must not be requested from or trusted as model output. The raw provider response, prompt, and base64 image data are not stored in PostgreSQL.
+
+Server-side TypeScript example (illustrative; keep the model name and schema in validated server configuration):
+
+```ts
+import OpenAI from "openai"
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+const response = await openai.responses.create({
+  model: process.env.OPENAI_TEXT_MODEL ?? "gpt-5",
+  input: [
+    { role: "system", content: "Create a gentle, age-appropriate bedtime story." },
+    { role: "user", content: JSON.stringify(storyRequest) },
+  ],
+  text: {
+    format: {
+      type: "json_schema",
+      name: "bedtime_story",
+      strict: true,
+      schema: bedtimeStorySchema,
+    },
+  },
+})
+
+const generated = JSON.parse(response.output_text) as GeneratedStory
+// Validate generated before inserting stories or story_pages rows.
+```
+
+This is a server-only example. The browser must call Express and must never receive `OPENAI_API_KEY`.
 
 ### Generation lifecycle
 
 1. Validate and normalize the genre, description, optional child information, story length, characters, and lesson.
 2. Create a privacy-preserving safety identifier and build the versioned server-side prompt.
 3. Call the configured OpenAI model with a timeout and intentional output limits.
-4. Validate the returned title, genre, summary, and ordered pages.
+4. Validate the returned title, genre, summary, ordered pages, image prompts, and accessibility descriptions.
 5. Reject empty pages, malformed structures, refusals or unsafe content, and content exceeding application limits.
-6. Persist the completed story transactionally and return a stable client contract.
+6. Persist the story and text pages transactionally. Treat page-image generation as an optional follow-up; update `image_url` only after an asset is successfully generated and stored.
+7. Return a stable client contract with nullable `imageUrl` and `imageAltText` when artwork is unavailable.
 
 ### Failure behavior
 
@@ -293,7 +346,7 @@ Use the Responses API and request a predictable structured result containing at 
 | Malformed or empty output | Fail output validation and write nothing | Preserve the form and offer Retry |
 | Database failure | Roll back the transaction and log a correlation identifier | Show a generic save failure and never claim success |
 
-Treat cover-image generation as optional and separate from the text-critical path. A genre-based local placeholder must allow the story reader to open when image generation is slow, unavailable, or deferred.
+Treat page-image generation as optional and separate from the text-critical path. A genre-based local placeholder must allow the story reader to open when image generation is slow, unavailable, or deferred. Use a hosted asset URL in the API/database, never a base64 image payload in PostgreSQL.
 
 ## Security and privacy
 

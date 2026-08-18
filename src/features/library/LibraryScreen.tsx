@@ -16,7 +16,7 @@ function LibraryScreen() {
     <>
       <AppHeader />
       <StorySearchSection imgSrc={pirateBoySearching} navigate={handleNavigate} />
-      <StoryInventorySection stories={SAVED_STORIES} navigate={handleNavigate} />
+      <StoryInventorySection stories={SAVED_STORIES} />
     </>
   )
 }

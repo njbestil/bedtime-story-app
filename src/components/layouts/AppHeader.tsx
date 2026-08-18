@@ -25,6 +25,7 @@ type MenuNavigationProps = {
 }
 
 type MenuButtonProps = {
+  isOpen: boolean
   onClick?: () => void
 }
 
@@ -41,12 +42,12 @@ function AppBrand() {
   )
 }
 
-function MenuButton({ onClick }: MenuButtonProps) {
+function MenuButton({ isOpen, onClick }: MenuButtonProps) {
   return (
     <button
       type="button"
       className="text-content-primary flex items-center gap-2 px-1 text-sm"
-      aria-expanded="false"
+      aria-expanded={isOpen}
       aria-controls="primary-navigation"
       onClick={onClick}
     >
@@ -73,8 +74,10 @@ function MenuNavigation({
       aria-label="Primary navigation"
       onAnimationEnd={onAnimationEnd}
     >
-      <button 
+      <button
+        type="button"
         className='fixed top-3 right-3'
+        aria-label="Close menu"
         onClick={onCloseMenu}
       >
         <FaXmark className="text-lg" aria-hidden="true" />
@@ -113,7 +116,7 @@ function AppHeader({ start, center, end }: AppHeaderProps) {
 
   const resolvedStart = usesDefaultContent ? <AppBrand /> : start
   const resolvedCenter = usesDefaultContent ? undefined : center
-  const resolvedEnd = usesDefaultContent ? <MenuButton onClick={toggleMenu} /> : end
+  const resolvedEnd = usesDefaultContent ? <MenuButton isOpen={isMenuOpen} onClick={toggleMenu} /> : end
 
   useEffect(() => {
     if (!isMenuOpen) {

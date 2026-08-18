@@ -1,12 +1,12 @@
 import type { LibraryStory } from '../library.types'
 import { getStoryReaderPath } from '../../../routes/paths'
+import { Link } from 'react-router'
 
 type StoryInventorySectionProps = {
   stories: LibraryStory[]
-  navigate: (path: string) => void
 }
 
-function StoryInventorySection({ stories, navigate }: StoryInventorySectionProps) {
+function StoryInventorySection({ stories }: StoryInventorySectionProps) {
   
   return (
     <section className="border-outline-muted border-t pt-5 pb-7" aria-labelledby="saved-stories-title">
@@ -27,31 +27,34 @@ function StoryInventorySection({ stories, navigate }: StoryInventorySectionProps
         </p>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3" aria-label="Saved stories">
+      <ul className="mt-5 grid grid-cols-2 gap-3" aria-label="Saved stories">
         {stories.map((story) => (
-          <article
+          <li
             key={story.id}
-            className="border-outline-strong overflow-hidden rounded-2xl border bg-app-surface text-left"
-            onClick={() => navigate(getStoryReaderPath(story.id))}
           >
-            <div
-              className="type-micro border-outline-muted text-content-muted flex h-24 items-center justify-center border-b border-dashed"
-              role="img"
-              aria-label={`${story.title} book cover placeholder`}
+            <Link
+              to={getStoryReaderPath(story.id)}
+              className="border-outline-strong block overflow-hidden rounded-2xl border bg-app-surface text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
             >
-              Book image
-            </div>
-            <div className="p-2.5">
-              <h3 className="type-card-title text-brand-accent">
-                {story.title}
-              </h3>
-              <p className="type-caption text-content-muted mt-0.5">
-                {story.category}
-              </p>
-            </div>
-          </article>
+              <div
+                className="type-micro border-outline-muted text-content-muted flex h-24 items-center justify-center border-b border-dashed"
+                role="img"
+                aria-label={`${story.title} book cover placeholder`}
+              >
+                Book image
+              </div>
+              <div className="p-2.5">
+                <h3 className="type-card-title text-brand-accent">
+                  {story.title}
+                </h3>
+                <p className="type-caption text-content-muted mt-0.5">
+                  {story.category}
+                </p>
+              </div>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }
