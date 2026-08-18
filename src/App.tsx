@@ -1,11 +1,19 @@
-import { useState } from "react"
-import LoadingScreen from './features/loading/LoadingScreen'
+import { Outlet } from 'react-router'
+import ScreenContent from './components/layouts/ScreenContent'
+import AppRoutes from './routes/AppRoutes'
 
-function App() {
-  const [loadingProgress, setLoadingProgress] = useState(0)
-
-  return <LoadingScreen progress={loadingProgress} />
+function AppLayout() {
+  return (
+    <main className="bg-app-background text-content-primary min-h-svh">
+      <ScreenContent>
+        <Outlet />
+      </ScreenContent>
+    </main>
+  )
 }
 
+function App() {
+  return <AppRoutes layout={<AppLayout />} />
+}
 
 export default App
