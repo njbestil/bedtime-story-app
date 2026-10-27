@@ -17,6 +17,16 @@ function getStoryId(request: Request): string {
   return storyId
 }
 
+export function createStory(_request: Request, response: Response) {
+  response.status(501).json({
+    error: {
+      code: "STORY_GENERATION_NOT_CONFIGURED",
+      message: "Story generation is not configured yet.",
+      requestId: response.locals.requestId,
+    },
+  })
+}
+
 export async function listStories(
   _request: Request,
   response: Response,

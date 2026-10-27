@@ -1,0 +1,7 @@
+@utility overlay-screen {
+  @apply fixed inset-0 z-9999;
+}
+
+@utility feature-header {
+  @apply bg-app-surface border-outline-muted fixed inset-x-0 top-0 z-40 grid min-h-11 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center border-b px-2.5 py-[max(0.5rem,calc(env(safe-area-inset-top)+0.25rem))];
+}

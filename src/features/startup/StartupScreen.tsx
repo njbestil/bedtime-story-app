@@ -1,19 +1,27 @@
+import { FaAnchor } from 'react-icons/fa6'
 import pirateShipLoading from '../../assets/pirate-ship-loading.gif'
-import { FaAnchor } from "react-icons/fa6";
-import type { LoadingScreenProps } from './loading.types'
+import Button from '../../components/Button'
+import type { StartupScreenProps } from './startup.types'
 
-function LoadingScreen({ progress, message }: LoadingScreenProps) {
+function StartupScreen({
+  isLoading,
+  progress,
+  message,
+  errorMessage,
+  onRetry,
+}: StartupScreenProps) {
+  const hasError = Boolean(errorMessage)
   const normalizedProgress = Math.min(100, Math.max(0, progress))
 
   return (
     <main
       className="bg-app-background text-content-primary min-h-svh text-center"
-      aria-busy="true"
+      aria-busy={isLoading}
     >
       <div className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col px-8 pb-[max(clamp(2rem,calc(16svh-3.375rem),5rem),env(safe-area-inset-bottom))]">
         <section
           className="flex flex-1 flex-col items-center justify-center"
-          aria-labelledby="loading-title"
+          aria-labelledby="startup-title"
         >
           <img
             src={pirateShipLoading}
@@ -28,19 +36,25 @@ function LoadingScreen({ progress, message }: LoadingScreenProps) {
           </p>
 
           <h1
-            id="loading-title"
+            id="startup-title"
             className="type-pirate-heading text-brand-accent mt-2 font-semibold"
           >
             Preparing the voyage...
           </h1>
 
-          <p
-            className="type-body text-content-primary mx-auto mt-3 max-w-[290px]"
-            role="status"
-            aria-live="polite"
-          >
-            {message}
+          <p className="type-body text-content-primary mx-auto mt-3 max-w-[290px]" role="status">
+            {isLoading ? message : ''}
           </p>
+
+          <p className="type-body text-content-primary mx-auto mt-3 max-w-[290px]" role="alert">
+            {errorMessage ?? ''}
+          </p>
+
+          {hasError && (
+            <Button type="button" className="mt-5 max-w-56" onClick={onRetry}>
+              Try again
+            </Button>
+          )}
         </section>
 
         <div
@@ -53,16 +67,7 @@ function LoadingScreen({ progress, message }: LoadingScreenProps) {
         >
           <div className="bg-progress-track h-[3px] overflow-hidden rounded-full">
             <div
-              className="
-              bg-progress-value
-                h-full
-                origin-left
-                rounded-full
-                motion-safe:transition-transform
-                motion-safe:duration-500
-                motion-safe:ease-out
-                motion-reduce:transition-none
-              "
+              className="bg-progress-value h-full origin-left rounded-full motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-reduce:transition-none"
               style={{
                 transform: `scaleX(${normalizedProgress / 100})`,
               }}
@@ -73,10 +78,9 @@ function LoadingScreen({ progress, message }: LoadingScreenProps) {
             {Math.round(normalizedProgress)}%
           </p>
         </div>
-
       </div>
     </main>
   )
 }
 
-export default LoadingScreen
+export default StartupScreen

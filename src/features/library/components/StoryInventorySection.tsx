@@ -1,12 +1,22 @@
-import type { LibraryStory } from '../library.types'
+import type { StorySummary } from '../../../types/story'
+import type { LibraryInventoryStatus } from '../library.types'
 import { getStoryReaderPath } from '../../../routes/paths'
 import { Link } from 'react-router'
+import Loading from '../../../components/Loading'
 
 type StoryInventorySectionProps = {
-  stories: LibraryStory[]
+  stories: StorySummary[]
+  status: LibraryInventoryStatus
+  errorMessage: string
+  onRetry: () => void
 }
 
-function StoryInventorySection({ stories }: StoryInventorySectionProps) {
+function StoryInventorySection({
+  stories,
+  status,
+  errorMessage,
+  onRetry,
+}: StoryInventorySectionProps) {
   
   return (
     <section className="border-outline-muted border-t pt-5 pb-7" aria-labelledby="saved-stories-title">
@@ -27,13 +37,29 @@ function StoryInventorySection({ stories }: StoryInventorySectionProps) {
         </p>
       </div>
 
-      <ul className="mt-5 grid grid-cols-2 gap-3" aria-label="Saved stories">
-        {stories.map((story) => (
+      <Loading
+        isLoading={status === 'loading'}
+        message="Loading saved discoveries…"
+        errorMessage={status === 'error' ? errorMessage : undefined}
+        onRetry={onRetry}
+      />
+
+      {status === 'ready' && stories.length === 0 && (
+        <p className="type-caption text-content-muted mt-5" role="status">
+          Your saved story inventory is ready for its first adventure.
+        </p>
+      )}
+
+      {status === 'ready' && stories.length > 0 && (
+        <ul className="mt-5 grid grid-cols-2 gap-3" aria-label="Saved stories">
+          {stories.map((story) => (
           <li
             key={story.id}
           >
             <Link
               to={getStoryReaderPath(story.id)}
+              state={{ storyPreview: story }}
+              viewTransition
               className="border-outline-strong block overflow-hidden rounded-2xl border bg-app-surface text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
             >
               <div
@@ -41,20 +67,21 @@ function StoryInventorySection({ stories }: StoryInventorySectionProps) {
                 role="img"
                 aria-label={`${story.title} book cover placeholder`}
               >
-                Book image
+                <img src={`${story.coverImageUrl}`} alt={`${story.coverImageAltText}`} />
               </div>
               <div className="p-2.5">
                 <h3 className="type-card-title text-brand-accent">
                   {story.title}
                 </h3>
                 <p className="type-caption text-content-muted mt-0.5">
-                  {story.category}
+                  {story.genre}
                 </p>
               </div>
             </Link>
           </li>
-        ))}
-      </ul>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

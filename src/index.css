@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import "./styles/theme.css";
+@import "./styles/fonts.css";
+@import "./styles/route-transitions.css";
+@import "./styles/utils.css";
 
 body {
   margin: 0;

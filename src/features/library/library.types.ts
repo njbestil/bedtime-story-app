@@ -1,5 +1,1 @@
-export type LibraryStory = {
-  id: string
-  title: string
-  category: string
-}
+export type LibraryInventoryStatus = 'loading' | 'ready' | 'error'

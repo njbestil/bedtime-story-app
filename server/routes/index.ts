@@ -31,6 +31,7 @@ apiRouter.get("/database-health", async (_request, response, next) => {
 
 apiRouter.use(storyRouter)
 
+console.log(environment.NODE_ENV)
 if (environment.NODE_ENV === 'development') {
   apiRouter.use('/development', developmentRouter)
 }

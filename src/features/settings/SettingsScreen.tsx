@@ -38,7 +38,7 @@ function SettingsScreen() {
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
-    navigate(APP_PATHS.library)
+    navigate(APP_PATHS.library, { viewTransition: true })
   }
 
   return (

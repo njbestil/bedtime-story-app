@@ -1,5 +1,6 @@
 import { Router } from "express"
 import {
+  createStory,
   deleteStory,
   getStory,
   listStories,
@@ -9,6 +10,7 @@ import {
 import { sessionMiddleware } from "../middleware/sessionMiddleware.ts"
 import { validateRequest } from "../middleware/validateRequest.ts"
 import {
+  createStorySchema,
   storyIdSchema,
   updateProgressSchema,
   updateSavedSchema,
@@ -18,6 +20,7 @@ export const storyRouter = Router()
 
 storyRouter.use(sessionMiddleware)
 storyRouter.get("/stories", listStories)
+storyRouter.post("/stories", validateRequest(createStorySchema), createStory)
 storyRouter.get("/stories/:id", validateRequest(storyIdSchema), getStory)
 storyRouter.patch("/stories/:id/progress", validateRequest(updateProgressSchema), updateProgress)
 storyRouter.patch("/stories/:id/saved", validateRequest(updateSavedSchema), updateSaved)

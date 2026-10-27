@@ -1,59 +1,46 @@
-import { Route, Routes } from 'react-router'
-import AppHeader from '../components/layouts/AppHeader'
+import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router'
+import { RouterProvider } from 'react-router/dom'
 import AppLayout from '../components/layouts/AppLayout'
 import ContentLayout from '../components/layouts/ContentLayout'
-import BackHeader from '../components/layouts/headers/BackHeader'
-import StoryReaderHeader from '../components/layouts/headers/StoryReaderHeader'
+import LibraryHeader from '../features/library/components/LibraryHeader'
 import LibraryScreen from '../features/library/LibraryScreen'
-import LoadingRoute from '../features/loading/LoadingRoute'
+import SettingsHeader from '../features/settings/components/SettingsHeader'
 import SettingsScreen from '../features/settings/SettingsScreen'
+import StartupRoute from '../features/startup/StartupRoute'
+import StoryGeneratorHeader from '../features/story-generator/components/StoryGeneratorHeader'
 import StoryGeneratorScreen from '../features/story-generator/StoryGeneratorScreen'
 import StoryReaderScreen from '../features/story-reader/StoryReaderScreen'
-import { MOONLIT_MAP_STORY } from '../features/story-reader/storyReader.constants'
+import StoryReaderRoute from '../features/story-reader/StoryReaderRoute'
 import { APP_PATHS } from './paths'
 
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path={APP_PATHS.loading} element={<LoadingRoute />} />
+const appRouter = createBrowserRouter(
+  createRoutesFromElements(
+    <>
+      <Route path={APP_PATHS.loading} element={<StartupRoute />} />
 
       <Route element={<AppLayout />}>
-        <Route element={<ContentLayout header={<AppHeader />} />}>
+        <Route element={<ContentLayout header={<LibraryHeader />} />}>
           <Route path={APP_PATHS.library} element={<LibraryScreen />} />
         </Route>
 
-        <Route
-          element={
-            <ContentLayout
-              header={<BackHeader title="Settings" backTo={APP_PATHS.library} />}
-            />
-          }
-        >
+        <Route element={<ContentLayout header={<SettingsHeader />} />}>
           <Route path={APP_PATHS.settings} element={<SettingsScreen />} />
         </Route>
 
-        <Route
-          element={
-            <ContentLayout
-              header={<BackHeader title="Find a Story" backTo={APP_PATHS.library} />}
-            />
-          }
-        >
+        <Route element={<ContentLayout header={<StoryGeneratorHeader />} />}>
           <Route path={APP_PATHS.storyGenerator} element={<StoryGeneratorScreen />} />
         </Route>
 
-        <Route
-          element={
-            <ContentLayout
-              header={<StoryReaderHeader initiallyBookmarked={MOONLIT_MAP_STORY.isBookmark} />}
-            />
-          }
-        >
+        <Route element={<StoryReaderRoute />}>
           <Route path={APP_PATHS.storyReader} element={<StoryReaderScreen />} />
         </Route>
       </Route>
-    </Routes>
-  )
+    </>,
+  ),
+)
+
+function AppRoutes() {
+  return <RouterProvider router={appRouter} />
 }
 
 export default AppRoutes
